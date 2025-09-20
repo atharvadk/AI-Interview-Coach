@@ -10,9 +10,9 @@ model = whisper.load_model("tiny")
 SAMPLE_RATE = 16000
 CHUNK_SIZE = 30  # seconds per chunk
 
-st.title("🎤 Whisper Recorder (Chunked & Safe for Long Audio)")
+st.title("Whisper Recorder")
 
-duration = st.number_input("Recording duration (seconds)", min_value=10, value=60)
+duration = st.number_input("Recording duration (seconds)", min_value=10, value=30)
 
 if st.button("Record Audio"):
     st.info("Recording...")
