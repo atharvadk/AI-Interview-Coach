@@ -1,0 +1,34 @@
+# Whisper for speech-to-text
+openai-whisper
+
+# PyTorch (for Transformers, sentiment analysis)
+torch>=2.1.0
+
+# Hugging Face Transformers for NLP tasks
+transformers>=4.40.0
+
+# Audio recording and processing
+sounddevice>=0.4.9
+soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Hugging Face Hub for model caching & downloading
+huggingface_hub>=0.17.1
+
+# Optional: Streamlit for GUI / dashboard
+streamlit>=1.30.0
+
+# Image/video processing if needed (e.g., posture, eye-tracking modules)
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Data handling
+pandas>=2.1.0
+
+# Visualization for any charts / feedback dashboards
+matplotlib>=3.8.0
+seaborn>=0.12.2
+
+# Optional: Scikit-learn for any ML-based scoring or metrics
+scikit-learn>=1.3.0
