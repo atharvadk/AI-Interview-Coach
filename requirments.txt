@@ -12,12 +12,17 @@ sounddevice>=0.4.9
 soundfile>=0.12.1
 numpy>=1.24.0
 scipy>=1.11.0
+pydub>=0.25.1        # added for audio chunking and format conversion
 
 # Hugging Face Hub for model caching & downloading
 huggingface_hub>=0.17.1
 
 # Optional: Streamlit for GUI / dashboard
 streamlit>=1.30.0
+
+# Backend Web Framework
+fastapi>=0.110.0     # added for API backend
+uvicorn>=0.29.0      # added for running FastAPI server
 
 # Image/video processing if needed (e.g., posture, eye-tracking modules)
 opencv-python>=4.8.0
