@@ -1,0 +1,30 @@
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# Node / React dependencies (optional if frontend is in repo)
+node_modules/
+
+# Streamlit session files (optional)
+.streamlit/
+
+# Uploads / temporary files
+backend/uploads/
