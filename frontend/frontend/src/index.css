@@ -1,0 +1,69 @@
+/* Set black background and white text site-wide */
+html, body, #root {
+  background-color: #000000; /* pure black background */
+  color: #ffffff;            /* white text for contrast */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove flex centering from body if present */
+body {
+  min-height: 100vh;
+  /* Remove display: flex and place-items if not intended */
+  /* display: flex; */
+  /* place-items: center; */
+}
+
+/* Style links for visibility on dark background */
+a {
+  font-weight: 500;
+  color: #646cff; /* light blue accent */
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+/* Style buttons with dark backgrounds and visible hover effect */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #222222;
+  color: white;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+button:hover {
+  border-color: #646cff;
+  background-color: #333333;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  color: white;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}

@@ -1,0 +1,347 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap');
+
+html, body, #root {
+  background-color: #000000; /* pure black background */
+  color: #ffffff;            /* white text for contrast */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif; /* or your preferred font */
+}
+
+body {
+  min-height: 100vh;
+}
+/* CSS Variables */
+:root {
+  --primary-color: #F5EFE6;
+  --primary-hover: #F5D2D2;
+  --secondary-color: #B9CDCF;
+  --background-light: #E7E3DA;
+  --accent-green: #637A60;
+  --background-green-light: #BFCCB5;
+  --text-color: #222222;
+  --text-light: #ffffff;
+  --border-color: #cccccc;
+  --error-color: #f44336;
+  --success-color: #4caf50;
+  --font-main: 'Alan Sans', sans-serif;
+  --font-alt: 'Open Sans', sans-serif;
+  --transition-speed: 0.3s;
+  --container-max-width: 960px;
+}
+
+/* Dark Mode Variables */
+.dark-mode {
+  --background-light: #121212;
+  --text-color: #eeeeee;
+  --primary-color: #90caf9;
+  --primary-hover: #64b5f6;
+  --secondary-color: #bbbbbb;
+  --border-color: #333333;
+  --error-color: #ff7875;
+  --success-color: #73d13d;
+}
+
+/* Reset & global styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--background-light);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-alt);
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 2.8rem;
+}
+
+h2 {
+  font-size: 2.2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+p {
+  font-size: 1rem;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+}
+
+/* Container for centering content */
+.container {
+  max-width: var(--container-max-width);
+  width: 90%;
+  margin: 0 auto;
+  padding: 15px 0;
+}
+
+/* Navigation bar */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--primary-color);
+  padding: 10px 20px;
+  color: var(--text-light);
+  transition: background-color var(--transition-speed);
+}
+
+nav .logo {
+  display: flex;
+  align-items: center;
+}
+
+nav .logo img {
+  height: 40px;
+  margin-right: 12px;
+  user-select: none;
+}
+
+nav .logo h2 {
+  margin: 0;
+  font-family: var(--font-alt);
+  color: var(--text-light);
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+nav a {
+  color: var(--text-light);
+  text-decoration: none;
+  margin: 0 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color var(--transition-speed);
+}
+
+nav a:hover,
+nav a.active {
+  color: var(--primary-hover);
+}
+
+/* Buttons */
+button {
+  background-color: var(--accent-green);
+  color: var(--text-light);
+  font-family: var(--font-alt);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), transform 0.15s ease-in-out;
+  user-select: none;
+}
+
+button:disabled,
+button[disabled] {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+/* Forms and inputs */
+input[type="file"],
+select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: var(--text-color);
+  outline-color: var(--primary-color);
+  transition: border-color var(--transition-speed);
+}
+
+input[type="file"]:focus,
+select:focus {
+  border-color: var(--primary-color);
+}
+
+/* Resume Upload Widget */
+.resume-upload-widget {
+  border: 2px dashed var(--border-color);
+  border-radius: 6px;
+  padding: 40px;
+  cursor: pointer;
+  transition: border-color var(--transition-speed), background-color var(--transition-speed);
+  user-select: none;
+  text-align: center;
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.resume-upload-widget:hover,
+.resume-upload-widget:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(97, 218, 251, 0.1);
+}
+
+.resume-upload-widget p {
+  margin: 0;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-weight: 600;
+}
+
+.success-message {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+/* Interview Page */
+.interview-video {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.question-panel {
+  font-family: var(--font-alt);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  color: var(--primary-color);
+}
+
+/* Progress Bars */
+.progress-bar {
+  width: 100%;
+  background-color: var(--border-color);
+  border-radius: 6px;
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease-in-out;
+  background-color: var(--primary-color);
+}
+
+.progress-bar-fill.high {
+  background-color: #4caf50;
+}
+
+.progress-bar-fill.medium {
+  background-color: #ff9800;
+}
+
+.progress-bar-fill.low {
+  background-color: #f44336;
+}
+
+/* Table for Profile past sessions */
+.past-sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.past-sessions-table th,
+.past-sessions-table td {
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  text-align: center;
+  font-family: var(--font-main);
+  color: var(--text-color);
+}
+
+.past-sessions-table th {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav a {
+    margin: 6px 0;
+  }
+
+  .interview-video {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .container {
+    width: 95%;
+    padding: 10px 0;
+    background-color: var(--background-light);
+  }
+}
+
+/* Dark Mode Support */
+.dark-mode {
+  --background-light: #121212;
+  --text-color: #eeeeee;
+  --primary-color: #90caf9;
+  --primary-hover: #64b5f6;
+  --secondary-color: #bbbbbb;
+  --border-color: #333333;
+  --error-color: #ff7875;
+  --success-color: #73d13d;
+
+  background-color: var(--background-light);
+  color: var(--text-color);
+}
+
+.dark-mode nav {
+  background-color: var(--primary-color);
+}
+
+.dark-mode .past-sessions-table th {
+  background-color: var(--primary-color);
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.profile-section {
+  background-color: var(--background-green-light);
+}
