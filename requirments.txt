@@ -13,6 +13,7 @@ soundfile>=0.12.1
 numpy>=1.24.0
 scipy>=1.11.0
 pydub>=0.25.1        # added for audio chunking and format conversion
+python-multipart
 
 # Hugging Face Hub for model caching & downloading
 huggingface_hub>=0.17.1
