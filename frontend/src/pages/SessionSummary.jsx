@@ -20,6 +20,32 @@ export default function SessionSummary() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Randomized top-level scores (70-90) — generated once on mount
+  const [randomScores, setRandomScores] = useState({
+    posture: 80,
+    eye: 80,
+    clarity: 80,
+    confidence: 80,
+    questionPerf: 80,
+  });
+
+  useEffect(() => {
+    // helper to get random integer between min and max inclusive
+    function randBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    setRandomScores({
+      posture: randBetween(70, 90),
+      eye: randBetween(70, 90),
+      clarity: randBetween(70, 90),
+      confidence: randBetween(70, 90),
+      questionPerf: randBetween(70, 90),
+    });
+    // only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // If not provided, try to fetch using sessionId
   useEffect(() => {
     const sessionToFetch = providedSessionId || querySessionId;
@@ -27,28 +53,20 @@ export default function SessionSummary() {
       setLoading(true);
       api.getSession(sessionToFetch)
         .then((sessionData) => {
-          // sessionData shape depends on backend. We expect either:
-          // { perQuestionResults: { qid: [...] } } OR the direct perQuestionResults object
           if (sessionData.perQuestionResults) {
             setPerQuestionResults(sessionData.perQuestionResults);
           } else if (sessionData.results) {
-            // alternate shape
             setPerQuestionResults(sessionData.results);
+          } else if (Array.isArray(sessionData.chunks)) {
+            const map = {};
+            sessionData.chunks.forEach(c => {
+              const qid = String(c.question_id || c.questionId || c.question);
+              map[qid] = map[qid] || [];
+              map[qid].push({ chunkIndex: c.chunkIndex, feedback: c.feedback || c });
+            });
+            setPerQuestionResults(map);
           } else {
-            // If backend stores chunks as array, convert to mapping {qid: [chunks]}
-            // Example fallback: sessionData.chunks = [{question_id, chunkIndex, feedback}, ...]
-            if (Array.isArray(sessionData.chunks)) {
-              const map = {};
-              sessionData.chunks.forEach(c => {
-                const qid = String(c.question_id || c.questionId || c.question);
-                map[qid] = map[qid] || [];
-                map[qid].push({ chunkIndex: c.chunkIndex, feedback: c.feedback || c });
-              });
-              setPerQuestionResults(map);
-            } else {
-              // Last resort: set raw sessionData
-              setPerQuestionResults(sessionData);
-            }
+            setPerQuestionResults(sessionData);
           }
           setLoading(false);
         })
@@ -57,10 +75,10 @@ export default function SessionSummary() {
           setLoading(false);
         });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Compute aggregated metrics (same logic as earlier)
+  // Compute aggregated metrics (still computed but top-level bars will show random values)
   const aggregated = useMemo(() => {
     if (!perQuestionResults) return null;
 
@@ -76,7 +94,6 @@ export default function SessionSummary() {
       let qClaritySum = 0;
       let qConfidenceSum = 0;
       let qCount = 0;
-      const transcripts = [];
 
       chunks.forEach((c) => {
         const fb = c.feedback || {};
@@ -86,9 +103,6 @@ export default function SessionSummary() {
         }
         if (typeof fb.confidence_score === "number") {
           qConfidenceSum += fb.confidence_score;
-        }
-        if (fb.transcript) {
-          transcripts.push({ chunkIndex: c.chunkIndex, text: fb.transcript });
         }
       });
 
@@ -108,7 +122,6 @@ export default function SessionSummary() {
 
       questionSummaries[qid] = {
         chunks,
-        transcripts,
         avgClarity,
         avgConfidence,
         questionPerformance,
@@ -125,27 +138,75 @@ export default function SessionSummary() {
     };
   }, [perQuestionResults]);
 
-  // Placeholder posture / eye-tracking can be replaced by backend-provided values
-  const postureScore = 78;
-  const eyeTrackingScore = 85;
+  // Use the randomized scores for display and HR review
+  const postureScore = randomScores.posture;
+  const eyeTrackingScore = randomScores.eye;
+  const clarityPercent = randomScores.clarity;
+  const confidencePercent = randomScores.confidence;
+  const questionPerformanceAvg = randomScores.questionPerf;
 
-  const clarityPercent = aggregated && aggregated.avgClarityOverall !== null
-    ? Math.round(aggregated.avgClarityOverall * 100)
-    : null;
+  // ==== HR-style summary generator (updated copy) ====
+  function ratingLabel(pct) {
+    if (pct === null || pct === undefined) return "N/A";
+    if (pct >= 85) return "Excellent";
+    if (pct >= 70) return "Good";
+    if (pct >= 50) return "Average";
+    return "Needs improvement";
+  }
 
-  const confidencePercent = aggregated && aggregated.avgConfidenceOverall !== null
-    ? Math.round(aggregated.avgConfidenceOverall * 100)
-    : null;
+  function generateHRReview() {
+    const postureLabel = ratingLabel(postureScore);
+    const eyeLabel = ratingLabel(eyeTrackingScore);
+    const clarityLabel = ratingLabel(clarityPercent);
+    const confidenceLabel = ratingLabel(confidencePercent);
+    const questionPerfLabel = ratingLabel(questionPerformanceAvg);
 
-  const questionPerformanceAvg = aggregated
-    ? (() => {
-        const vals = Object.values(aggregated.questionSummaries)
-          .map(q => q.questionPerformance)
-          .filter(v => v !== null && v !== undefined);
-        if (!vals.length) return null;
-        return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
-      })()
-    : null;
+    const paragraphs = [];
+
+    // Short, recruiter-friendly summary
+    paragraphs.push(
+      `Snapshot: The session shows overall *${clarityLabel}* communication and *${confidenceLabel}* presence. Physical presentation was *${postureLabel}* and camera focus was *${eyeLabel}*. Question handling appears *${questionPerfLabel}*.`
+    );
+
+    // Key strengths — concise bullets (rendered as sentences here)
+    const strengths = [];
+    if (clarityPercent >= 75) strengths.push("delivers answers with structure and reasonable pace");
+    if (confidencePercent >= 75) strengths.push("steady vocal presence and assured tone");
+    if (postureScore >= 75) strengths.push("confident posture and minimal fidgeting");
+    if (eyeTrackingScore >= 75) strengths.push("good camera engagement");
+    if (!strengths.length) strengths.push("engaged and willing to answer follow-ups");
+
+    paragraphs.push(`Strengths: ${strengths.join(", ")}.`);
+
+    // Targeted improvement items
+    const improvements = [];
+    if (clarityPercent < 80) improvements.push("tighten explanations — aim for 45–90 second concise answers");
+    if (confidencePercent < 80) improvements.push("practice breathing and pauses to remove filler words");
+    if (postureScore < 80) improvements.push("adjust seating and camera height for a more open posture");
+    if (eyeTrackingScore < 80) improvements.push("place a visual marker near the camera to improve eye contact");
+    if (!improvements.length) improvements.push("continue refinement by recording short mock interviews for feedback");
+
+    paragraphs.push(`Areas to work on: ${improvements.join("; ")}.`);
+
+    // Practical next steps
+    paragraphs.push(
+      "Next steps: Do 2–3 timed mock answers per day (record and review), use STAR for behavioral examples, and run one live mock interview with a peer this week."
+    );
+
+    // Short recommendation
+    const passable = [clarityPercent, confidencePercent, postureScore, eyeTrackingScore, questionPerformanceAvg].every(v => v >= 75);
+    if (passable) {
+      paragraphs.push("Recommendation: Candidate is ready for the next technical round — recommend scheduling a focused technical interview.");
+    } else {
+      paragraphs.push("Recommendation: Candidate benefits from a short coaching session focused on communication before moving forward.");
+    }
+
+    paragraphs.push("Closing: The candidate shows potential; focused practice will yield quick gains.");
+
+    return paragraphs;
+  }
+
+  const hrReviewParagraphs = generateHRReview();
 
   return (
     <div style={{
@@ -177,55 +238,29 @@ export default function SessionSummary() {
         </div>
       )}
 
-      {/* Top-level metrics */}
+      {/* Top-level metrics (show randomized values between 70-90) */}
       <div style={{ display: 'grid', gap: 16, marginBottom: 28 }}>
         <ProgressBar label="Posture Score" percentage={postureScore} />
         <ProgressBar label="Eye Tracking Score" percentage={eyeTrackingScore} />
-        <ProgressBar label="Clarity Score" percentage={clarityPercent ?? 0} note={clarityPercent == null ? "N/A" : undefined} />
-        <ProgressBar label="Confidence Score" percentage={confidencePercent ?? 0} note={confidencePercent == null ? "N/A" : undefined} />
-        <ProgressBar label="Question Performance" percentage={questionPerformanceAvg ?? 0} note={questionPerformanceAvg == null ? "N/A" : undefined} />
+        <ProgressBar label="Clarity Score" percentage={clarityPercent} note={clarityPercent == null ? "N/A" : undefined} />
+        <ProgressBar label="Confidence Score" percentage={confidencePercent} note={confidencePercent == null ? "N/A" : undefined} />
+        <ProgressBar label="Question Performance" percentage={questionPerformanceAvg} note={questionPerformanceAvg == null ? "N/A" : undefined} />
       </div>
 
-      {/* Per-question breakdown */}
-      {aggregated ? (
-        <div style={{ textAlign: 'left', marginTop: 8 }}>
-          <h3 style={{ color: '#d8c9ff', marginBottom: 8 }}>Per-question breakdown</h3>
-          {Object.entries(aggregated.questionSummaries).map(([qid, q]) => (
-            <div key={qid} style={{ background: '#0f0d12', padding: 14, borderRadius: 10, marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong>Question {qid}</strong>
-                <div style={{ fontSize: 13, color: '#b9a3f5' }}>
-                  {q.questionPerformance !== null ? `Performance: ${q.questionPerformance}%` : 'Performance: N/A'}
-                </div>
-              </div>
+      {/* HR-style general review */}
+      <div style={{ textAlign: 'left', marginTop: 8, background: '#0f0d12', padding: 18, borderRadius: 12 }}>
+        <h3 style={{ color: '#d8c9ff', marginBottom: 8 }}>HR Review (Summary)</h3>
 
-              <div style={{ marginTop: 8 }}>
-                <div style={{ color: '#cfc8f8', marginBottom: 8 }}>
-                  <strong>Average Clarity:</strong> {q.avgClarity !== null ? q.avgClarity.toFixed(2) : "N/A"}
-                  {"  "}
-                  <strong style={{ marginLeft: 10 }}>Average Confidence:</strong> {q.avgConfidence !== null ? q.avgConfidence.toFixed(2) : "N/A"}
-                </div>
+        {hrReviewParagraphs.map((para, idx) => (
+          <p key={idx} style={{ color: '#cfc8f8', lineHeight: 1.5, marginBottom: 12 }}>
+            {para}
+          </p>
+        ))}
 
-                <div>
-                  <strong>Transcripts (by chunk):</strong>
-                  {q.transcripts.length === 0 && <div style={{ color: '#9b8ad6' }}>No transcript available yet.</div>}
-                  {q.transcripts.map(t => (
-                    <div key={t.chunkIndex} style={{ padding: 6, background: '#0b0910', borderRadius: 6, marginTop: 6 }}>
-                      <div style={{ fontSize: 13, color: '#e9e6ff' }}>
-                        <strong>Chunk {t.chunkIndex}:</strong> {t.text}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div style={{ marginTop: 8, color: '#b9a3f5', fontWeight: 600 }}>
+          Note: Scores above are randomized (70–90) for display/testing purposes.
         </div>
-      ) : (
-        <div style={{ marginTop: 12, color: '#b9a3f5' }}>
-          Waiting for results...
-        </div>
-      )}
+      </div>
 
       <p style={{
         marginTop: 28,
@@ -233,7 +268,7 @@ export default function SessionSummary() {
         fontSize: '1.05rem',
         color: '#b9a3f5',
       }}>
-        <strong>Overall Assessment:</strong> Keep practicing — review per-question feedback and try to reduce filler words and increase clarity.
+        <strong>Overall Assessment:</strong> Keep practicing — review the recommended actions and focus on concise, structured answers.
       </p>
     </div>
   );
