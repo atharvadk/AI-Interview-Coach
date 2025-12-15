@@ -485,6 +485,13 @@ Artificial Intelligence and Data Science
 Vishwakarma Institute of Technology, Pune
 
 - GitHub: [@atharvadk](https://github.com/atharvadk)
+
+**Srushti Kasurde**  
+Artificial Intelligence and Data Science  
+Vishwakarma Institute of Technology, Pune
+
+- GitHub: [@atharvadk](https://github.com/srushti1010-kasurde)
+
 - Repository: [AI-Interview-Coach](https://github.com/atharvadk/AI-Interview-Coach)
 
 ---
